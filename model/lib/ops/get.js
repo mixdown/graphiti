@@ -13,7 +13,6 @@ module.exports.history = function (id, done) {
     reduce: false
   }, function (err, body) {
 
-    logger.debug('Model History: ' + self.model_type + ' ', err, body);
 
     if (err) {
       return done(err);

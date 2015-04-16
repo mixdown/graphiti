@@ -229,7 +229,7 @@ module.exports = BasePlugin.extend({
           //If the error is that the database exists already then we are okay
           if (err && err.error != 'file_exists') {
             // return error if db create fail
-            logger.error('jadshflksadhlkds', self._options);
+
             err.stack = 'db.create(): Database (' + couch_options.database + ') not found and could not be created. \n' + err.stack;
             cb(err);
           } else {
