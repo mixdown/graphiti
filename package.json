@@ -1,0 +1,28 @@
+{
+  "name": "graphiti",
+  "version": "1.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec -u tdd test/model/tests/*.js && mocha -R spec -u tdd test/entity/tests/*.js"
+  },
+  "dependencies": {
+    "JSONStream": "^0.10.0",
+    "async": "^0.9.0",
+    "deep-equal": "^1.0.0",
+    "jsonschema": "^1.0.0",
+    "lodash": "^3.3.1",
+    "mixdown-app": "^3.0.4",
+    "nano": "^6.1.2",
+    "node-uuid": "^1.4.1",
+    "property-path": "0.0.5"
+  },
+  "devDependencies": {
+    "memory-stream": "0.0.3",
+    "mocha": "~1.20.1"
+  },
+  "description": "Base model mixin/plugin for C* based data object",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mixdown/graphiti.git"
+  }
+}
