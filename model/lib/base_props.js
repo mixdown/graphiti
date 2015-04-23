@@ -31,5 +31,19 @@ module.exports = {
     "type": "boolean",
     "required": true,
     "default": true
+  },
+  "users_with_permissions_to_this_content": {
+    "type": "array",
+    "items": {
+      "$ref": "/permission"
+    }
+
+  },
+  "groups_with_permissions_to_this_content": {
+    "type": "array",
+    "items": {
+      "$ref": "/permission"
+    }
+
   }
 };

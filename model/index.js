@@ -8,6 +8,7 @@ var uuid = require('node-uuid');
 var Model = require('./lib/model.js');
 var omit_nulls = require('./lib/omit_nulls.js');
 var ensure_design_documents = require('../helpers/ensure_design_documents.js');
+var permissions_schema = require('./lib/permissions_schema.js');
 
 // Create a new plugin from the base plugin class.
 // this._options is the options hash that was passed on init.
@@ -48,6 +49,7 @@ module.exports = BasePlugin.extend({
     }
 
     this.validator = new Validator();
+    this.validator.addSchema(permissions_schema, '/permissions');
 
     // ensure core properties exist on the model.
     this.schema.properties = _.extend(_.cloneDeep(base_props), this.schema.properties);
