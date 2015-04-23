@@ -11,7 +11,7 @@ module.exports = function (couch_options) {
 
   return nano({
     url: couch_options.url,
-    request_defaults: {
+    requestDefaults: {
       auth: couch_options.auth
     },
     log: function (id, args) {
