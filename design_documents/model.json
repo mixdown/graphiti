@@ -4,7 +4,7 @@
   "views": {
     "id": {
       "map": "function(doc) {\n  emit(doc.id, doc._id);\n}",
-      "reduce": "function(keys,values,rereduce){\n\treturn values.reduce(function(acc,val){\n\t\tif(acc >= val){\n\t\t\treturn acc;\n\t\t}\n\t\telse {\n\t\t\treturn val\n\t\t} \n\t},\n\t\"\")\n}"
+      "reduce": "function(key, values, rereduce) {\nvar max = \"\"\n\nfor(var i=0;i<values.length;++i){\n\tvar val = values[i];\n\tif(val>=max){\n\t\tmax = val;\n\t}\n}\n\nreturn max;\n}"
     },
     "type": {
       "map": "function(doc) {\n  emit(doc.type, doc.id);\n}"
