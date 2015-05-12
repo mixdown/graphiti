@@ -4,11 +4,10 @@
   "views": {
     "id": {
       "map": "function(doc) {\n  emit(doc.id, doc._id);\n}",
-      "reduce": "function(key, values, rereduce) {\nif (!rereduce) {\n    return values[values.length-1];\n} else {\nreturn null;\n}\n}"
+      "reduce": "function(keys,values,rereduce){\n\treturn values.reduce(function(acc,val){\n\t\tif(acc >= val){\n\t\t\treturn acc;\n\t\t}\n\t\telse {\n\t\t\treturn val\n\t\t} \n\t},\n\t\"\")\n}"
     },
     "type": {
-      "map": "function(doc) {\n  emit(doc.type, doc.id);\n}",
-      "reduce": "function(key, values) {\n    return null;\n}"
+      "map": "function(doc) {\n  emit(doc.type, doc.id);\n}"
     }
   }
 }
