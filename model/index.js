@@ -203,7 +203,7 @@ module.exports = BasePlugin.extend({
     var couch_options = this._options.couchdb;
 
     //this is default true, the DB will be bootstrapped unless you explicitly say dont do it!
-    var ensure_db = (this._options.ensure_db === false) || false;
+    var ensure_db = (this._options.ensure_db === false) ? false : true;
 
     // NOTE: "this" is the plugin itself.  no need to use the getter/setter here.  Only on the interface exposed to users.
     var db_connection = create_couch_connection(couch_options);
