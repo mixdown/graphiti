@@ -75,10 +75,7 @@ module.exports = function (entity, hydrate_options, callback) {
     })));
     callback(err, entity);
   });
-
 };
-
-
 
 // generates a function for multi-get in hydrate.
 var factory_model_list = function (app, content_ids, model_type, depth) {

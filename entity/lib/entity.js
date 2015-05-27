@@ -25,6 +25,7 @@ module.exports = Model.extend({
       self._valid_types[model_type] = true;
     });
   },
+  
   set_hydrated_content: function (hydrated) {
     var self = this;
     this.hydrated_content = Array.isArray(hydrated) ? {} : hydrated;
@@ -116,6 +117,7 @@ module.exports = Model.extend({
     vm.type = this.type;
     return vm;
   },
+
   get: function (prop) {
     return prop ? this.attrs[prop] : _.pick(this.attrs, function (p) {
       return (typeof (p) != "function");
@@ -144,7 +146,6 @@ module.exports = Model.extend({
     return _.find(this.content, function (content) {
       return content.model_id === content_id;
     });
-
   },
 
   add_content: function (content_model) {

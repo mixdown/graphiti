@@ -56,6 +56,7 @@ module.exports = BasePlugin.extend({
 
     // generate the list of properties for this model.
     this.properties = {};
+    
     _.each(this.schema.properties, function (spec, name) {
       var ptype = 'text';
 
@@ -100,7 +101,6 @@ module.exports = BasePlugin.extend({
 
       self.properties[name] = ptype;
     });
-
   },
 
   new_model: function (attrs) {
@@ -190,7 +190,6 @@ module.exports = BasePlugin.extend({
   // Removes the model from DB
   delete: require('./lib/ops/delete.js'),
 
-
   // Persists the model to DB
   // Saves the model to the table in C*
   // if model.id is not a valid uuid, then error.
@@ -203,48 +202,57 @@ module.exports = BasePlugin.extend({
   _setup: function (done) {
     var couch_options = this._options.couchdb;
 
+    //this is default true, the DB will be bootstrapped unless you explicitly say dont do it!
+    var ensure_db = (this._options.ensure_db === false) || false;
+
     // NOTE: "this" is the plugin itself.  no need to use the getter/setter here.  Only on the interface exposed to users.
     var db_connection = create_couch_connection(couch_options);
-
-    var setup_ops = [];
     var self = this;
 
-    setup_ops.push(function (cb) {
-      // check if db exists..  create if not.
-      db_connection.db.list(function (err, body) {
+    if(ensure_db){
+      var setup_ops = [
+        function (cb) {
+          // check if db exists..  create if not.
+          db_connection.db.list(function (err, body) {
 
-        if (err) {
-          err.message = 'db.list(): ' + err.message;
-          cb(err);
-          return;
-        }
-        // body is an array
-        var db = _.find(body, function (db) {
-          return db === couch_options.database;
-        });
-        if (db) {
-          self.db = db_connection.use(couch_options.database);
-          cb();
-          return;
-        }
-        db_connection.db.create(couch_options.database, function (err, body) {
-          //If the error is that the database exists already then we are okay
-          if (err && err.error != 'file_exists') {
-            // return error if db create fail
+            if (err) {
+              err.message = 'db.list(): ' + err.message;
+              cb(err);
+              return;
+            }
+            // body is an array
+            var db = _.find(body, function (db) {
+              return db === couch_options.database;
+            });
+            if (db) {
+              self.db = db_connection.use(couch_options.database);
+              cb();
+              return;
+            }
+            db_connection.db.create(couch_options.database, function (err, body) {
+              //If the error is that the database exists already then we are okay
+              if (err && err.error != 'file_exists') {
+                // return error if db create fail
 
-            err.stack = 'db.create(): Database (' + couch_options.database + ') not found and could not be created. \n' + err.stack;
-            cb(err);
-          } else {
-            self.db = db_connection.use(couch_options.database);
-            cb();
-          }
-        });
+                err.stack = 'db.create(): Database (' + couch_options.database + ') not found and could not be created. \n' + err.stack;
+                cb(err);
+              } else {
+                self.db = db_connection.use(couch_options.database);
+                cb();
+              }
+            });
 
-      });
-    });
+          });
+        },
 
-    setup_ops.push(ensure_design_documents.bind(null, self));
+        ensure_design_documents.bind(null, self)
+      ];
 
-    async.series(setup_ops, done);
+      async.series(setup_ops, done);
+    }
+    else{
+      self.db = db_connection.use(couch_options.database);
+      done(null);
+    }
   }
 });
