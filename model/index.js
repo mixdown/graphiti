@@ -56,7 +56,7 @@ module.exports = BasePlugin.extend({
 
     // generate the list of properties for this model.
     this.properties = {};
-    
+
     _.each(this.schema.properties, function (spec, name) {
       var ptype = 'text';
 
@@ -209,48 +209,31 @@ module.exports = BasePlugin.extend({
     var db_connection = create_couch_connection(couch_options);
     var self = this;
 
-    if(ensure_db){
-      var setup_ops = [
-        function (cb) {
-          // check if db exists..  create if not.
-          db_connection.db.list(function (err, body) {
+    if (ensure_db) {
+      // trying to ensure the design docs - if it fails create db.
+      ensure_design_documents(self, function (err, data) {
 
-            if (err) {
-              err.message = 'db.list(): ' + err.message;
-              cb(err);
-              return;
-            }
-            // body is an array
-            var db = _.find(body, function (db) {
-              return db === couch_options.database;
-            });
-            if (db) {
-              self.db = db_connection.use(couch_options.database);
-              cb();
-              return;
-            }
-            db_connection.db.create(couch_options.database, function (err, body) {
-              //If the error is that the database exists already then we are okay
-              if (err && err.error != 'file_exists') {
-                // return error if db create fail
+        if (err) {
+          db_connection.db.create(couch_options.database, function (err, body) {
 
-                err.stack = 'db.create(): Database (' + couch_options.database + ') not found and could not be created. \n' + err.stack;
-                cb(err);
-              } else {
-                self.db = db_connection.use(couch_options.database);
-                cb();
-              }
-            });
+            //If the error is that the database exists already then we are okay
+            if (err && err.error != 'file_exists') {
+              // return error if db create fail
+              err.stack = 'db.create(): Database (' + couch_options.database + ') not found and could not be created. \n' + err.stack;
+              done(err);
+            } else {
+              //we've now created the db so ensure dds & done
+              ensure_design_documents(self, done);
+            }
 
           });
-        },
+        } else {
+          //good to go, callback
+          done();
+        }
+      });
 
-        ensure_design_documents.bind(null, self)
-      ];
-
-      async.series(setup_ops, done);
-    }
-    else{
+    } else {
       self.db = db_connection.use(couch_options.database);
       done(null);
     }
