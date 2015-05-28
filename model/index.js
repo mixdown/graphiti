@@ -208,6 +208,7 @@ module.exports = BasePlugin.extend({
     // NOTE: "this" is the plugin itself.  no need to use the getter/setter here.  Only on the interface exposed to users.
     var db_connection = create_couch_connection(couch_options);
     var self = this;
+    self.db = db_connection.use(couch_options.database);
 
     if (ensure_db) {
       // trying to ensure the design docs - if it fails create db.
