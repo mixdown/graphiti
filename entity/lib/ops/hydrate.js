@@ -1,5 +1,8 @@
 var async = require('async');
 var _ = require('lodash');
+var resolve = function (app, ns) {
+  return _.get(app, ns) || _.get(app, ns + 's');
+};
 
 /*
  * hydrate_options.types {Array} - List of types to hydrate
@@ -45,7 +48,7 @@ module.exports = function (entity, hydrate_options, callback) {
 
       // this is a type on the entity and the plugin was initialized on the app, then we support hydrating this.
       // QUESTION: should we throw when a type that is not valid is passed?
-      hydrate_types[t] = entity_types[t] === true && app.hasOwnProperty(t + 's');
+      hydrate_types[t] = entity_types[t] === true && !!resolve(app, t);
     });
   }
 
@@ -53,7 +56,6 @@ module.exports = function (entity, hydrate_options, callback) {
   var content_ids = {};
   // generate the functions which pull the data from C*
   var ops = {};
-
 
   // create list of ids for each model_type so we can make a single C* call for each type, not each item.
   _.each(entity.get_content(), function (c) {
@@ -80,7 +82,7 @@ module.exports = function (entity, hydrate_options, callback) {
 // generates a function for multi-get in hydrate.
 var factory_model_list = function (app, content_ids, model_type, depth) {
 
-  var app_plugin = app[model_type] ? app[model_type] : app[model_type + 's'];
+  var app_plugin = resolve(app, model_type);
 
   return function (cb) {
 
