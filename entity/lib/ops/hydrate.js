@@ -48,7 +48,7 @@ module.exports = function (entity, hydrate_options, callback) {
 
       // this is a type on the entity and the plugin was initialized on the app, then we support hydrating this.
       // QUESTION: should we throw when a type that is not valid is passed?
-      hydrate_types[t] = entity_types[t] === true && !!resolve(app, t);
+      hydrate_types[t] = (entity_types === null || entity_types[t] === true) && !!resolve(app, t);
     });
   }
 
