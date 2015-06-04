@@ -1,6 +1,6 @@
 {
   "name": "graphiti",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec -u tdd test/model/tests/*.js && mocha -R spec -u tdd test/entity/tests/*.js"
