@@ -63,7 +63,7 @@ module.exports = function (entity, hydrate_options, callback) {
 
       // prevent infinite recursion & ensure we only add the fn to ops 1 time.
       if (!ops[c.model_type] && !(entity.attrs.id === c.model_id && entity.model_type === c.model_type)) {
-        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth);
+        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth, types);
       }
     }
   });
@@ -78,7 +78,7 @@ module.exports = function (entity, hydrate_options, callback) {
 };
 
 // generates a function for multi-get in hydrate.
-var factory_model_list = function (app, content_ids, model_type, depth) {
+var factory_model_list = function (app, content_ids, model_type, depth, types) {
 
   var app_plugin = app[model_type] ? app[model_type] : app[model_type + 's'];
 
@@ -103,7 +103,8 @@ var factory_model_list = function (app, content_ids, model_type, depth) {
             }
 
             app_plugin.hydrate(m, {
-              depth: depth - 1
+              depth: depth - 1,
+              types: types
             }, cbh);
           };
 
