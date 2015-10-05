@@ -63,7 +63,7 @@ module.exports = function (entity, hydrate_options, callback) {
 
       // prevent infinite recursion & ensure we only add the fn to ops 1 time.
       if (!ops[c.model_type] && !(entity.attrs.id === c.model_id && entity.model_type === c.model_type)) {
-        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth, types);
+        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth, hydrate_types);
       }
     }
   });
