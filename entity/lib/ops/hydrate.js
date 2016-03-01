@@ -105,13 +105,15 @@ var factory_model_list = function (app, content_ids, model_type, depth, types) {
         var ops = _.map(results, function (m) {
 
           //we only want to recurse active records
-          debug('model is:', m);
-
           return function (cbh) {
-            if (!m || !m.active) {
+            debug('m.attrs are:', m.attrs);
+
+            if (!m || !m.attrs.active) {
               return cbh(null, null);
             }
+
             debug('recursively hydrating: ', model_type, _.pick(m, ["id"]));
+
             app_plugin.hydrate(m, {
               depth: depth - 1,
               types: types
