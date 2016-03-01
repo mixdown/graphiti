@@ -63,10 +63,10 @@ module.exports = function (entity, hydrate_options, callback) {
       content_ids[c.model_type].push(c.model_id);
 
       // prevent infinite recursion & ensure we only add the fn to ops 1 time.
-      if (!ops[c.model_type] && !(entity.attrs.id === c.model_id && entity.model_type === c.model_type)) {
+      if (!ops[c.model_type] && !(entity.attrs.id === c.model_id && entity.type === c.model_type)) {
 
         debug("c.model_type is:", c.model_type);
-        debug("entity.model_type is:", entity.model_type);
+        debug("entity.type is:", entity.type);
         debug("entity.attrs.id:", entity.attrs.id);
 
         ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth, types);
@@ -95,6 +95,7 @@ var factory_model_list = function (app, content_ids, model_type, depth, types) {
       return cb(new Error("content model_type is not set or model_type plugin does not exist on app. " + model_type), null);
     }
 
+    debug('getting content ids of ', content_ids.length);
     app_plugin.get(content_ids[model_type], function (err, results) {
 
       // entities get recursively hydrated, models already are.
@@ -104,18 +105,19 @@ var factory_model_list = function (app, content_ids, model_type, depth, types) {
         var ops = _.map(results, function (m) {
 
           //we only want to recurse active records
-          if (m.active) {
-            return function (cbh) {
-              if (!m) {
-                return cbh(null, null);
-              }
-              debug('recursively hydrating: ', model_type, _.pick(m, ["id"]));
-              app_plugin.hydrate(m, {
-                depth: depth - 1,
-                types: types
-              }, cbh);
-            };
-          }
+          debug('model is:', m);
+
+          return function (cbh) {
+            if (!m || !m.active) {
+              return cbh(null, null);
+            }
+            debug('recursively hydrating: ', model_type, _.pick(m, ["id"]));
+            app_plugin.hydrate(m, {
+              depth: depth - 1,
+              types: types
+            }, cbh);
+          };
+
 
         });
 
