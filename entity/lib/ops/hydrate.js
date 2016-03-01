@@ -1,5 +1,6 @@
 var async = require('async');
 var _ = require('lodash');
+var debug = require('debug')('graphiti');
 
 /*
  * hydrate_options.types {Array} - List of types to hydrate
@@ -63,7 +64,12 @@ module.exports = function (entity, hydrate_options, callback) {
 
       // prevent infinite recursion & ensure we only add the fn to ops 1 time.
       if (!ops[c.model_type] && !(entity.attrs.id === c.model_id && entity.model_type === c.model_type)) {
-        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth, hydrate_types);
+
+        debug("c.model_type is:", c.model_type);
+        debug("entity.model_type is:", entity.model_type);
+        debug("entity.attrs.id:", entity.attrs.id);
+
+        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth, types);
       }
     }
   });
@@ -97,16 +103,19 @@ var factory_model_list = function (app, content_ids, model_type, depth, types) {
 
         var ops = _.map(results, function (m) {
 
-          return function (cbh) {
-            if (!m) {
-              return cbh(null, null);
-            }
-
-            app_plugin.hydrate(m, {
-              depth: depth - 1,
-              types: types
-            }, cbh);
-          };
+          //we only want to recurse active records
+          if (m.active) {
+            return function (cbh) {
+              if (!m) {
+                return cbh(null, null);
+              }
+              debug('recursively hydrating: ', model_type, _.pick(m, ["id"]));
+              app_plugin.hydrate(m, {
+                depth: depth - 1,
+                types: types
+              }, cbh);
+            };
+          }
 
         });
 
