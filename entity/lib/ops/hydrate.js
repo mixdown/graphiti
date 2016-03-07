@@ -95,7 +95,6 @@ var factory_model_list = function (app, content_ids, model_type, depth, types) {
       return cb(new Error("content model_type is not set or model_type plugin does not exist on app. " + model_type), null);
     }
 
-    debug('getting content ids of ', content_ids.length);
     app_plugin.get(content_ids[model_type], function (err, results) {
 
       // entities get recursively hydrated, models already are.
@@ -111,8 +110,6 @@ var factory_model_list = function (app, content_ids, model_type, depth, types) {
             if (!m || !m.attrs.active) {
               return cbh(null, null);
             }
-
-            debug('recursively hydrating: ', model_type, _.pick(m, ["id"]));
 
             app_plugin.hydrate(m, {
               depth: depth - 1,
