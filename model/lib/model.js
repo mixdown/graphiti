@@ -39,12 +39,7 @@ var Model = module.exports = BasePlugin.extend({
       _.each(this.history, function (row) {
 
         if (!timestamp || timestamp > row.updated_date) {
-
-          if (row.hasOwnProperty("base_entity_graph") && row.base_entity_graph.length == 0) {
-            row = _.without(row, "base_entity_graph");
-          }
-
-          record = _.extend(record || {}, row);
+          record = _.merge(record || {}, row);
         }
       });
 
