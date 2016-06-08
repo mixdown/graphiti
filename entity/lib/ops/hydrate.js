@@ -1,5 +1,6 @@
 var async = require('async');
 var _ = require('lodash');
+var debug = require('debug')('graphiti');
 
 /*
  * hydrate_options.types {Array} - List of types to hydrate
@@ -62,8 +63,13 @@ module.exports = function (entity, hydrate_options, callback) {
       content_ids[c.model_type].push(c.model_id);
 
       // prevent infinite recursion & ensure we only add the fn to ops 1 time.
-      if (!ops[c.model_type] && !(entity.attrs.id === c.model_id && entity.model_type === c.model_type)) {
-        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth);
+      if (!ops[c.model_type] && !(entity.attrs.id === c.model_id && entity.type === c.model_type)) {
+
+        debug("c.model_type is:", c.model_type);
+        debug("entity.type is:", entity.type);
+        debug("entity.attrs.id:", entity.attrs.id);
+
+        ops[c.model_type] = factory_model_list(app, content_ids, c.model_type, depth, types);
       }
     }
   });
@@ -78,7 +84,7 @@ module.exports = function (entity, hydrate_options, callback) {
 };
 
 // generates a function for multi-get in hydrate.
-var factory_model_list = function (app, content_ids, model_type, depth) {
+var factory_model_list = function (app, content_ids, model_type, depth, types) {
 
   var app_plugin = app[model_type] ? app[model_type] : app[model_type + 's'];
 
@@ -97,15 +103,20 @@ var factory_model_list = function (app, content_ids, model_type, depth) {
 
         var ops = _.map(results, function (m) {
 
+          //we only want to recurse active records
           return function (cbh) {
-            if (!m) {
+            debug('m.attrs are:', m.attrs);
+
+            if (!m || !m.attrs.active) {
               return cbh(null, null);
             }
 
             app_plugin.hydrate(m, {
-              depth: depth - 1
+              depth: depth - 1,
+              types: types
             }, cbh);
           };
+
 
         });
 

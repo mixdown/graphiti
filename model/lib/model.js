@@ -39,7 +39,7 @@ var Model = module.exports = BasePlugin.extend({
       _.each(this.history, function (row) {
 
         if (!timestamp || timestamp > row.updated_date) {
-          record = _.extend(record || {}, row);
+          record = _.merge(record || {}, row);
         }
       });
 

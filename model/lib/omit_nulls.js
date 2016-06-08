@@ -1,7 +1,13 @@
 var _ = require('lodash');
 
-module.exports = function(obj) {
-  return _.omit(obj || {}, function(value) {
-    return value === null;
+var omit_nulls = module.exports = function (obj) {
+  return _.omit(obj || {}, function (value) {
+    //if this is an array - dig deeper
+    if (value instanceof Array) {
+      value = omit_nulls(value);
+    } else {
+      return value === null;
+    }
+
   });
 };
